@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Concern World-wide Kenya - Field Collector</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        kenyaGreen: '#006600',
+                        kenyaRed: '#BB0000',
+                        kenyaBlack: '#000000',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+
+        /* Screen transitions */
+        .screen-view {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.25s ease-in-out;
+        }
+        .screen-view.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Swinging Kenya Flag Ribbon Animation */
+        .flag-stripe-container {
+            width: 100%;
+            height: 8px;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+        .flag-black { background-color: #000000; flex: 1; }
+        .flag-white-top { background-color: #ffffff; height: 1.5px; width: 100%; }
+        .flag-red { background-color: #BB0000; flex: 1; }
+        .flag-white-bottom { background-color: #ffffff; height: 1.5px; width: 100%; }
+        .flag-green { background-color: #006600; flex: 1; }
+
+        .swing-ribbon {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 10px;
+            transform-origin: top center;
+            animation: flagSwing 3.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes flagSwing {
+            0% { transform: skewX(-4deg) scaleY(1); }
+            50% { transform: skewX(0deg) scaleY(1.1); }
+            100% { transform: skewX(4deg) scaleY(1); }
+        }
+
+        /* Mobile touch feedback styling */
+        .touch-active:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col pb-20 md:pb-0 select-none">
+
+    <!-- Top Global Header -->
+    <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md">
+        <!-- Swinging Flag Ribbon -->
+        <div class="overflow-hidden">
+            <div class="swing-ribbon">
+                <div class="flag-black"></div>
+                <div class="flag-white-top"></div>
+                <div class="flag-red"></div>
+                <div class="flag-white-bottom"></div>
+                <div class="flag-green"></div>
+            </div>
+        </div>
+
+        <div class="max-w-md mx-auto md:max-w-4xl px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <!-- Instagram Style Black Box Logo with CWWK -->
+                <div class="w-11 h-11 bg-black rounded-2xl flex items-center justify-center p-0.5 border border-slate-700 shadow-md relative group">
+                    <div class="w-full h-full border border-slate-800 rounded-xl flex items-center justify-center bg-gradient-to-tr from-black via-slate-950 to-slate-900">
+                        <span class="font-black text-xs tracking-tighter text-white">CWWK</span>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base md:text-lg leading-tight tracking-wide flex items-center gap-2">
+                        Concern World-wide Kenya
+                    </h1>
+                    <p class="text-[11px] text-emerald-400 font-medium">Ground Field Intelligence &amp; Survey Tracker</p>
+                </div>
+            </div>
+
+            <!-- Active Status Badge -->
+            <div id="top-status-badge" class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 text-xs text-slate-300">
+                <span id="status-dot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+                <span id="active-session-text" class="text-[11px] font-semibold truncate max-w-[120px] md:max-w-xs">Setup Mode</span>
+            </div>
+        </div>
+
+        <!-- Desktop Screen Nav Switcher -->
+        <nav class="bg-slate-800 border-t border-slate-700/60 hidden md:block">
+            <div class="max-w-4xl mx-auto px-4 flex space-x-2">
+                <button onclick="switchScreen(1)" id="desk-nav-1" class="nav-tab px-4 py-2.5 text-xs font-bold border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> 1. Location &amp; Seat Setup
+                </button>
+                <button onclick="switchScreen(2)" id="desk-nav-2" class="nav-tab px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-question"></i> 2. Live Field Survey
+                </button>
+                <button onclick="switchScreen(3)" id="desk-nav-3" class="nav-tab px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie"></i> 3. Analytics &amp; History
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Mobile Container -->
+    <main class="flex-grow max-w-md mx-auto md:max-w-4xl w-full p-4 space-y-4">
+
+        <!-- SCREEN 1: SURVEY SETUP & LOCATION SELECTOR -->
+        <section id="screen-1" class="screen-view active space-y-4">
+            
+            <!-- Banner -->
+            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-green-950 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
+                <div class="relative z-10">
+                    <span class="bg-emerald-500/20 text-emerald-300 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-2 inline-block border border-emerald-500/30">Step 1 of 2</span>
+                    <h2 class="text-xl font-black mb-1">Target Area Selection</h2>
+                    <p class="text-slate-300 text-xs leading-relaxed">
+                        Select county administrative boundaries and political seat to load smart diagnostic surveys across Kenya.
+                    </p>
+                </div>
+                <i class="fa-solid fa-map-location-dot absolute -right-3 -bottom-5 text-7xl text-white/5 pointer-events-none"></i>
+            </div>
+
+            <!-- Cascade Region Cards -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3.5">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-layer-group text-emerald-600"></i> Region Selection
+                </h3>
+
+                <!-- 1. County Selector -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">1. County Level (All 47 Counties)</label>
+                    <select id="select-county" onchange="handleCountyChange()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-3 text-xs font-semibold outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="">-- Select County --</option>
+                    </select>
+                </div>
+
+                <!-- 2. Constituency Selector -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">2. Constituency</label>
+                    <select id="select-constituency" onchange="handleConstituencyChange()" disabled class="w-full bg-slate-100 border border-slate-300 text-slate-800 rounded-xl p-3 text-xs font-semibold outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50">
+                        <option value="">-- Select County First --</option>
+                    </select>
+                </div>
+
+                <!-- 3. Ward Selector -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">3. Electoral Ward</label>
+                    <select id="select-ward" onchange="checkSetupValidity()" disabled class="w-full bg-slate-100 border border-slate-300 text-slate-800 rounded-xl p-3 text-xs font-semibold outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50">
+                        <option value="">-- Select Constituency First --</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Target Seat Selector Grid -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-tie text-emerald-600"></i> Political Office Seat
+                </h3>
+
+                <div class="grid grid-cols-2 gap-2.5" id="seat-selector-grid">
+                    <button type="button" onclick="selectSeat('President')" data-seat="President" class="seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all">
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">National</div>
+                        <div class="text-xs font-black text-slate-800">President</div>
+                    </button>
+
+                    <button type="button" onclick="selectSeat('Governor')" data-seat="Governor" class="seat-card border-2 border-emerald-500 bg-emerald-50/60 p-3 rounded-xl text-left touch-active transition-all">
+                        <div class="text-[10px] text-emerald-700 font-bold uppercase">County Executive</div>
+                        <div class="text-xs font-black text-slate-900">Governor</div>
+                    </button>
+
+                    <button type="button" onclick="selectSeat('MP')" data-seat="MP" class="seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all">
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">Constituency</div>
+                        <div class="text-xs font-black text-slate-800">MP (NG-CDF)</div>
+                    </button>
+
+                    <button type="button" onclick="selectSeat('MCA')" data-seat="MCA" class="seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all">
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">Grassroots Ward</div>
+                        <div class="text-xs font-black text-slate-800">MCA</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Smart Questions & Custom Builder Mode -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Survey Mode</h3>
+
+                    <div class="inline-flex rounded-lg bg-slate-100 p-1 border border-slate-200 text-[11px]">
+                        <button type="button" id="btn-mode-default" onclick="setQuestionMode('default')" class="px-2.5 py-1 rounded-md font-bold bg-white text-slate-900 shadow-xs">
+                            Smart Default
+                        </button>
+                        <button type="button" id="btn-mode-custom" onclick="setQuestionMode('custom')" class="px-2.5 py-1 rounded-md font-semibold text-slate-500">
+                            + Custom
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Built-In Smart Questions Preview -->
+                <div id="default-questions-preview" class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <p class="text-[11px] text-slate-500 mb-2 font-semibold">Diagnostic prompts for <span id="seat-preview-label" class="font-black text-emerald-700">Governor</span>:</p>
+                    <ul id="questions-list-preview" class="space-y-2 text-xs font-medium">
+                        <!-- JS populated -->
+                    </ul>
+                </div>
+
+                <!-- Custom Question Builder -->
+                <div id="custom-questions-builder" class="hidden bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-200 space-y-3">
+                    <span class="text-xs font-black text-emerald-900 uppercase tracking-wider block">Add Custom Question</span>
+
+                    <div>
+                        <input type="text" id="custom-q-title" placeholder="Question prompt (e.g. Rate water availability)" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+
+                    <div>
+                        <input type="text" id="custom-q-options" placeholder="Choices (comma-separated: Daily, 2-3 days, Never)" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+
+                    <button type="button" onclick="addCustomQuestion()" class="w-full bg-slate-900 text-white text-xs font-bold py-2 rounded-lg touch-active">
+                        + Add Question Option
+                    </button>
+
+                    <div id="custom-added-list" class="space-y-1.5 pt-2 border-t border-emerald-200">
+                        <p class="text-[11px] text-slate-400 italic">No custom questions added.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Start Survey Trigger -->
+            <button type="button" id="btn-start-survey" onclick="startSurveySession()" disabled class="w-full bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-300 text-white font-extrabold py-3.5 rounded-xl shadow-lg transition-all text-sm flex items-center justify-center gap-2 disabled:cursor-not-allowed touch-active">
+                <span>Start Field Data Collection</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+
+        </section>
+
+        <!-- SCREEN 2: LIVE FIELD SURVEY -->
+        <section id="screen-2" class="screen-view space-y-4">
+
+            <!-- Location & Session Banner -->
+            <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md border-l-4 border-emerald-500 space-y-1">
+                <div class="flex items-center justify-between text-[11px] text-emerald-400 font-bold uppercase">
+                    <span><i class="fa-solid fa-location-dot"></i> Active Location</span>
+                    <span id="active-seat-badge" class="bg-emerald-500/20 px-2 py-0.5 rounded text-emerald-300">Governor</span>
+                </div>
+                <h2 id="active-location-title" class="text-base font-black truncate">Nairobi &gt; Westlands &gt; Parklands</h2>
+                <div class="text-[11px] text-slate-400 flex items-center justify-between pt-1 border-t border-slate-800">
+                    <span>Current Session Entries:</span>
+                    <strong id="session-count-tag" class="text-emerald-400 font-bold text-xs">0 Respondents</strong>
+                </div>
+            </div>
+
+            <!-- Survey Questions Form Container -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <span class="text-xs font-black text-slate-800">Interview Questionnaire</span>
+                    <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                        Respondent #<span id="current-respondent-id">1</span>
+                    </span>
+                </div>
+
+                <!-- Dynamic Question Blocks -->
+                <div id="survey-questions-container" class="space-y-4">
+                    <!-- JS populated -->
+                </div>
+
+                <!-- Mandatory Sentiment Question -->
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5">
+                    <label class="block text-xs font-black text-slate-800">
+                        OVERALL VOTER SENTIMENT TOWARDS CURRENT LEADERSHIP:
+                    </label>
+
+                    <div class="grid grid-cols-3 gap-2" id="sentiment-selector">
+                        <button type="button" onclick="selectSentiment('Positive')" data-sentiment="Positive" class="sentiment-btn border-2 border-slate-200 bg-white p-2.5 rounded-xl text-center touch-active">
+                            <i class="fa-solid fa-smile text-emerald-600 text-lg block mb-0.5"></i>
+                            <span class="text-[11px] font-bold text-slate-800 block">Positive</span>
+                        </button>
+
+                        <button type="button" onclick="selectSentiment('Neutral')" data-sentiment="Neutral" class="sentiment-btn border-2 border-slate-200 bg-white p-2.5 rounded-xl text-center touch-active">
+                            <i class="fa-solid fa-meh text-amber-500 text-lg block mb-0.5"></i>
+                            <span class="text-[11px] font-bold text-slate-800 block">Neutral</span>
+                        </button>
+
+                        <button type="button" onclick="selectSentiment('Negative')" data-sentiment="Negative" class="sentiment-btn border-2 border-slate-200 bg-white p-2.5 rounded-xl text-center touch-active">
+                            <i class="fa-solid fa-frown text-rose-600 text-lg block mb-0.5"></i>
+                            <span class="text-[11px] font-bold text-slate-800 block">Negative</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- REAL-TIME SENTIMENT TALLY BARS -->
+                <div class="bg-slate-900 text-white p-4 rounded-xl space-y-2.5">
+                    <div class="flex items-center justify-between text-[11px]">
+                        <span class="font-extrabold text-slate-300 uppercase tracking-wider">Ordered Sentiment Tally</span>
+                        <span class="text-slate-400 text-[10px]"><i class="fa-solid fa-arrow-down-wide-short text-emerald-400"></i> Ranked Highest to Lowest</span>
+                    </div>
+
+                    <div id="ordered-sentiment-bars-container" class="space-y-2">
+                        <!-- JS Dynamic Bars -->
+                    </div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="space-y-2 pt-1">
+                    <button type="button" onclick="submitRespondentData(true)" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow transition-all text-xs flex items-center justify-center gap-2 touch-active">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Next Person (Save &amp; Reset Form)</span>
+                    </button>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="pauseSession()" class="bg-slate-700 hover:bg-slate-800 text-white font-semibold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 touch-active">
+                            <i class="fa-solid fa-pause"></i>
+                            <span>Pause Survey</span>
+                        </button>
+
+                        <button type="button" onclick="finalizeSession()" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 touch-active">
+                            <i class="fa-solid fa-check-double"></i>
+                            <span>End &amp; Finalize</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- SCREEN 3: ANALYTICS & SURVEY HISTORY -->
+        <section id="screen-3" class="screen-view space-y-4">
+
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-black text-slate-900">Survey History &amp; Analytics</h2>
+                    <p class="text-xs text-slate-500">Concern World-wide Kenya field logs</p>
+                </div>
+
+                <button onclick="switchScreen(1)" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-3 py-2 rounded-xl shadow flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> New Setup
+                </button>
+            </div>
+
+            <!-- Search & Filter Controls -->
+            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex gap-2">
+                <div class="relative flex-grow">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                    <input type="text" id="history-search" oninput="renderHistoryList()" placeholder="Search County, Ward, or Seat..." class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <select id="history-filter-status" onchange="renderHistoryList()" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-lg px-2 py-2 outline-none font-semibold">
+                    <option value="ALL">All Status</option>
+                    <option value="FINALIZED">Finalized</option>
+                    <option value="PAUSED">Paused</option>
+                </select>
+            </div>
+
+            <!-- History Cards List -->
+            <div id="history-cards-container" class="space-y-3">
+                <!-- JS populated -->
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 z-50 px-3 py-2">
+        <div class="grid grid-cols-3 gap-1 text-center">
+            <button onclick="switchScreen(1)" id="mob-nav-1" class="py-1 text-emerald-400 flex flex-col items-center gap-1 font-bold text-[11px]">
+                <i class="fa-solid fa-sliders text-base"></i>
+                <span>Setup</span>
+            </button>
+            <button onclick="switchScreen(2)" id="mob-nav-2" class="py-1 text-slate-400 flex flex-col items-center gap-1 font-bold text-[11px]">
+                <i class="fa-solid fa-clipboard-question text-base"></i>
+                <span>Survey</span>
+            </button>
+            <button onclick="switchScreen(3)" id="mob-nav-3" class="py-1 text-slate-400 flex flex-col items-center gap-1 font-bold text-[11px]">
+                <i class="fa-solid fa-chart-pie text-base"></i>
+                <span>History</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Briefing Modal -->
+    <div id="briefing-modal" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-5 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                <div class="flex items-center gap-2 text-emerald-800 font-black text-sm">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>Field Briefing Report</span>
+                </div>
+                <button onclick="closeBriefingModal()" class="text-slate-400 font-bold text-lg px-2">&times;</button>
+            </div>
+
+            <div id="modal-content-body" class="space-y-3 text-xs text-slate-800">
+                <!-- JS injected -->
+            </div>
+
+            <div class="pt-2 border-t border-slate-200 flex justify-between items-center">
+                <button type="button" onclick="closeBriefingModal()" class="px-3 py-2 bg-slate-100 text-slate-700 font-bold rounded-lg text-xs">Close</button>
+                <button type="button" onclick="triggerCopyReport()" class="px-3 py-2 bg-slate-900 text-white font-bold rounded-lg text-xs flex items-center gap-1.5">
+                    <i class="fa-solid fa-copy"></i> Copy Briefing Text
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Data Directory & Logic -->
+    <script>
+        // --- 1. COMPREHENSIVE 47 KENYA COUNTIES DIRECTORY ---
+        const kenyaData = {
+            "Baringo": { "Baringo Central": ["Kabarnet", "Sacho", "Ewalel Soi"], "Baringo North": ["Barwessa", "Kabartonjo"], "Baringo South": ["Marigat", "Ilchamus"], "Eldama Ravine": ["Lembus", "Ravine"], "Mogotio": ["Mogotio", "Emining"], "Tiaty": ["Tirioko", "Kolowa"] },
+            "Bomet": { "Bomet Central": ["Siloibwet", "Ndaraweta"], "Bomet East": ["Longisa", "Kembu"], "Chepalungu": ["Sigor", "Kongasis"], "Konoin": ["Mogogosiek", "Boito"], "Sotik": ["Ndanai/Abosi", "Kipsonoi"] },
+            "Bungoma": { "Bungoma Central": ["Kabuchai"], "Bumula": ["Bumula", "Khasoko"], "Kabuchai": ["Mukweyi"], "Kanduyi": ["Bukembe West", "Bukembe East", "Township", "Khalaba"], "Mt. Elgon": ["Cheptais", "Elgon"], "Sirisia": ["Namwela", "Lwandanyi"], "Tongaren": ["Tongaren", "Soysambu"], "Webuye East": ["Ndivisi", "Maraka"], "Webuye West": ["Sitikho", "Matulo", "Bokoli"] },
+            "Busia": { "Budalangi": ["Bunyala North", "Bunyala South"], "Butula": ["Marachi West", "Kingandole"], "Funyula": ["Namboboto", "Ageng'a"], "Nambale": ["Nambale Township"], "Teso North": ["Malaba Central", "Ang'urai"], "Teso South": ["Amukura West", "Amukura East"], "Matayos": ["Busia Township", "Burumba"] },
+            "Elgeyo Marakwet": { "Keiyo North": ["Emsoo", "Kamariny"], "Keiyo South": ["Soy North", "Kaptarakwa"], "Marakwet East": ["Kapyego", "Sambirir"], "Marakwet West": ["Lelan", "Sengwer"] },
+            "Embu": { "Manyatta": ["Ruguru", "Kithimu", "Ngandori"], "Runyenjes": ["Gaturi", "Kagaari"], "Mbeere North": ["Evuroore", "Muminji"], "Mbeere South": ["Mwea", "Makima"] },
+            "Garissa": { "Garissa Township": ["Waberi", "Iftin", "Township"], "Balambala": ["Balambala"], "Dadaab": ["Dadaab", "Labasigale"], "Fafi": ["Bura", "Nanighi"], "Ijara": ["Ijara", "Masalani"], "Lagdera": ["Modogashe"] },
+            "Homa Bay": { "Homa Bay Town": ["Homa Bay Central"], "Kabondo Kasipul": ["Kabondo East"], "Karachuonyo": ["Kendu Bay Town"], "Kasipul": ["Oyugis"], "Mbita": ["Rusinga Island", "Mfangano"], "Ndhiwa": ["Kwabwai", "Kanyadoto"], "Rangwe": ["Kochia"], "Suba": ["Gwassi"] },
+            "Isiolo": { "Isiolo": ["Bulla Pesa", "Burat"], "Merti": ["Cherab"], "Garbatulla": ["Garbatulla", "Kinna"] },
+            "Kajiado": { "Kajiado Central": ["Purko", "Ildamat"], "Kajiado East": ["Kitengela", "Sholinke", "Oloosirkon"], "Kajiado North": ["Olkeri", "Ongata Rongai", "Nkaimurunya", "Oloolua"], "Kajiado South": ["Entonet", "Kimana"], "Kajiado West": ["Magadi", "Ewuaso"] },
+            "Kakamega": { "Butere": ["Marama North", "Marama South"], "Kakamega Central": ["Lurambi"], "Kakamega East": ["Shinyalu"], "Kakamega North": ["Malava"], "Kakamega South": ["Ikolomani"], "Khwisero": ["Kisa North"], "Lugari": ["Lumakanda"], "Lukuyani": ["Likuyani"], "Lurambi": ["Butsotso East", "Butsotso South", "Sheywe", "Mahiakalo"], "Matungu": ["Koyonzo"], "Mumias East": ["Lusheya"], "Mumias West": ["Mumias Central"], "Navakholo": ["Ingotse"] },
+            "Kericho": { "Ainamoi": ["Ainamoi", "Kipchebor"], "Belgut": ["Kabianga", "Waldai"], "Bureti": ["Litein", "Cheplanget"], "Kipkelion East": ["Londiani"], "Kipkelion West": ["Kipkelion"], "Soin/Sigowet": ["Soin", "Sigowet"] },
+            "Kiambu": { "Gatundu North": ["Gituamba"], "Gatundu South": ["Ngenda"], "Githunguri": ["Githunguri"], "Juja": ["Juja", "Kalimoni"], "Kabete": ["Gitaru", "Kabete"], "Kiambaa": ["Karuri", "Ndenderu"], "Kiambu Town": ["Township", "Riabai", "Ting'ang'a", "Ndumberi"], "Kikuyu": ["Karai", "Nderi", "Sigona", "Kikuyu Township"], "Lari": ["Kijabe", "Lari"], "Ruiru": ["Gitothua", "Biashara", "Gatongora", "Kahawa Sukari", "Kahawa Wendani"], "Thika Town": ["Township", "Kamenu", "Hospital", "Gatuanyaga"], "Limuru": ["Limuru Central"] },
+            "Kilifi": { "Ganze": ["Ganze", "Bamba"], "Kaloleni": ["Kaloleni", "Mariakani"], "Kilifi North": ["Tezo", "Sokoni", "Kibarani", "Dabaso", "Matsangoni"], "Kilifi South": ["Junju", "Mtwapa"], "Magarini": ["Marafa", "Magarini"], "Malindi": ["Jilore", "Kakuyuni", "Ganda", "Malindi Town"], "Rabai": ["Rabai", "Mwawesa"] },
+            "Kirinyaga": { "Kirinyaga Central": ["Kerugoya", "Inoi"], "Kirinyaga East": ["Gichugu"], "Kirinyaga West": ["Ndidia"], "Mwea East": ["Tebere"], "Mwea West": ["Kangai"] },
+            "Kisii": { "Kitutu Chache North": ["Monienga"], "Kitutu Chache South": ["Bogusero", "Bogeka", "Nyakoe", "Kitutu Central"], "Nyaribari Chache": ["Bobaracho", "Kisii Central", "Keumbu"], "Nyaribari Masaba": ["Masaba"], "South Mugirango": ["Tabaka"], "Bomachoge Borabu": ["Bomorenda"], "Bomachoge Chache": ["Ogembo"], "Bobasi": ["Bassie"], "Bonchari": ["Riana"] },
+            "Kisumu": { "Kisumu Central": ["Railways", "Migosi", "Shaurimoyo", "Nyalenda B"], "Kisumu East": ["Kajulu", "Kolwa East", "Kolwa Central", "Manyatta B"], "Kisumu West": ["Kisumu North", "West Seme"], "Muhoroni": ["Muhoroni", "Koru"], "Nyando": ["Ahero", "Awasi"], "Nyakach": ["South West Nyakach"], "Seme": ["Central Seme"] },
+            "Kitui": { "Kitui Central": ["Township", "Kyangwithya"], "Kitui East": ["Zombe"], "Kitui Rural": ["Kwasavon"], "Kitui South": ["Mutomo"], "Kitui West": ["Kabati"], "Mwingi Central": ["Mwingi Town"], "Mwingi North": ["Kyuso"], "Mwingi West": ["Migwani"] },
+            "Kwale": { "Kinango": ["Kinango", "Chengoni"], "Lunga Lunga": ["Pongwe", "Dzombo"], "Msambweni": ["Ukunda", "Gombato"], "Matuga": ["Kwale Town", "Tiwi"] },
+            "Laikipia": { "Laikipia Central": ["Nanyuki"], "Laikipia East": ["Umande"], "Laikipia North": ["Sosian"], "Laikipia West": ["Rumuruti"], "Nyahururu": ["Igwamiti"] },
+            "Lamu": { "Lamu East": ["Faza", "Kiunga"], "Lamu West": ["Shella", "Mpetekoni"] },
+            "Machakos": { "Machakos Town": ["Kalama", "Muputi", "Machakos Central", "Muvuti"], "Mavoko": ["Athiriver", "Syokimau/Mulolongo", "Kinanie", "Muthwani"], "Masinga": ["Masinga Central"], "Yatta": ["Matuu"], "Kangundo": ["Kangundo Central"], "Matungulu": ["Tala"], "Kathiani": ["Kathiani Central"], "Mwala": ["Masii"] },
+            "Makueni": { "Kaiti": ["Ukia"], "Kibwezi East": ["Mtito Andei"], "Kibwezi West": ["Makindu"], "Kilome": ["Mukaa"], "Makueni": ["Wote"], "Mbooni": ["Mbooni"] },
+            "Mandera": { "Banissa": ["Banissa"], "Lafey": ["Lafey"], "Mandera East": ["Township"], "Mandera North": ["Rhamu"], "Mandera South": ["Elwak"], "Mandera West": ["Takaba"] },
+            "Marsabit": { "Laisamis": ["Laisamis"], "Moyale": ["Moyale Township"], "North Horr": ["North Horr"], "Saku": ["Marsabit Central"] },
+            "Meru": { "Imenti Central": ["Abothuguchi"], "Imenti North": ["Municipality"], "Imenti South": ["Igoji"], "Buuri": ["Timau"], "Tigania East": ["Miklinduri"], "Tigania West": ["Kianjai"], "Igembe Central": ["Maili Tatu"], "Igembe North": ["Laare"], "Igembe South": ["Maua"] },
+            "Migori": { "Awendo": ["Awendo"], "Kurya East": ["Ntimaru"], "Kurya West": ["Kehancha"], "Ntimaru": ["Ntimaru"], "Rongo": ["Rongo"], "Suna East": ["Migori Town"], "Suna West": ["Wasweta"], "Uriri": ["Uriri"], "Nyatike": ["Macalder"] },
+            "Mombasa": { "Changamwe": ["Changamwe", "Port Reitz", "Kipevu", "Airport", "Chaani"], "Jomvu": ["Jomvu Kuu", "Miritini", "Mikindani"], "Kisauni": ["Mjambere", "Junda", "Bamburi", "Mwakirunge", "Mtopanga", "Magogoni", "Shanzu"], "Nyali": ["Frere Town", "Ziwa La Ng'ombe", "Mkomani", "Kongowea", "Kadzandani"], "Likoni": ["Mtongwe", "Shika Adabu", "Bofu", "Likoni", "Timbwani"], "Mvita": ["Mji wa Kale/Makadara", "Tudor", "Tononoka", "Shimanzi/Ganjoni", "Majengo"] },
+            "Murang'a": { "Gatanga": ["Gatanga"], "Kandara": ["Kandara"], "Kangema": ["Kangema"], "Kigumo": ["Kigumo"], "Kiharu": ["Murang'a Town"], "Mathioya": ["Kiru"], "Maragua": ["Maragua"] },
+            "Nairobi": { "Dagoretti North": ["Kilimani", "Kawangware", "Gatina", "Kileleshwa", "Kabiro"], "Dagoretti South": ["Mutu-ini", "Ngando", "Riruta", "Uthiru/Ruthimitu", "Waithaka"], "Embakasi Central": ["Kayole North", "Kayole Central", "Kayole South", "Komarock", "Matopeni"], "Embakasi East": ["Upper Savanna", "Lower Savanna", "Embakasi", "Utawala", "Mihango"], "Embakasi North": ["Kariobangi North", "Dandora Area I", "Dandora Area II", "Dandora Area III", "Dandora Area IV"], "Embakasi South": ["Imara Daima", "Kwa Njenga", "Kwa Reuban", "Pipeline", "Kware"], "Embakasi West": ["Umoja I", "Umoja II", "Mowlem", "Kariobangi South"], "Kamukunji": ["Pumwani", "Eastleigh North", "Eastleigh South", "Airbase", "California"], "Kasarani": ["Clay City", "Mwiki", "Kasarani", "Njiru", "Ruai"], "Kibra": ["Laini Saba", "Lindi", "Makina", "Woodley/Kenyatta Golf Course", "Sarang'ombe"], "Lang'ata": ["Karen", "Nairobi West", "Mugumu-ini", "South C", "Nyayo Highrise"], "Makadara": ["Maringo/Hamza", "Harambee", "Makadara", "Viwandani"], "Mathare": ["Mbatini", "Huruma", "Ngei", "Mlango Kubwa", "Kiamaiko", "Hospital"], "Roysambu": ["Roysambu", "Garden Estate", "Muthaiga", "Kahawa West", "Kahawa"], "Ruaraka": ["Babadogo", "Utalii", "Mathare North", "Lucky Summer", "Korogocho"], "Starehe": ["Nairobi Central", "Ngara", "Pangani", "Ziwani/Kariokor", "Landimawe", "Nairobi South"], "Westlands": ["Kitisuru", "Parklands/Highridge", "Karura", "Kangemi", "Mountain View"] },
+            "Nakuru": { "Bahati": ["Bahati"], "Gilgil": ["Gilgil"], "Kuresoi North": ["Sirikwa"], "Kuresoi South": ["Keringet"], "Molo": ["Molo"], "Naivasha": ["Naivasha Town", "Hell's Gate", "Olkaria", "Mai Mahiu"], "Nakuru Town East": ["Biashara", "Kivumbini", "Flamingo", "Menengai"], "Nakuru Town West": ["Barut", "London", "Kaptembwo"], "Njoro": ["Njoro"], "Rongai": ["Rongai"], "Subukia": ["Subukia"] },
+            "Nandi": { "Aldai": ["Kabwareng"], "Chesumei": ["Lelmokwo"], "Emgwen": ["Kapsabet"], "Mosop": ["Kabisaga"], "Nandi Hills": ["Nandi Hills"], "Tinderet": ["Tinderet"] },
+            "Narok": { "Narok East": ["Maikona"], "Narok North": ["Narok Town"], "Narok South": ["Ololulung'a"], "Narok West": ["Lemek"], "Kilgoris": ["Kilgoris Central"], "Emurua Dikirr": ["Mogondo"] },
+            "Nyamira": { "Borabu": ["Esise"], "Manga": ["Manga"], "Masaba North": ["Rigoma"], "Nyamira North": ["Ekerenyo"], "Nyamira South": ["Nyamira Town"] },
+            "Nyandarua": { "Kinangop": ["Engineer"], "Kipipiri": ["Kipipiri"], "Ol Kalou": ["Ol Kalou"], "Ol Jorok": ["Ol Jorok"], "Ndaragua": ["Ndaragua"] },
+            "Nyeri": { "Kieni East": ["Naro Moru"], "Kieni West": ["Mweiga"], "Mathira East": ["Karatina"], "Mathira West": ["Iriaini"], "Mukurweini": ["Mukurweini Central"], "Nyeri Town": ["Rware", "Ruring'u", "Kiganjo/Mathari"], "Othaya": ["Othaya Town"] },
+            "Samburu": { "Samburu East": ["Wamba"], "Samburu North": ["Baragoi"], "Samburu West": ["Maralal"] },
+            "Siaya": { "Alego Usonga": ["Siaya Township", "Central Alego"], "Bondo": ["Bondo Town", "Yimbo East"], "Gem": ["Yala", "Anyiko"], "Rarieda": ["Madiany"], "Ugenya": ["Ukwala"], "Ugunja": ["Ugunja"] },
+            "Taita Taveta": { "Taveta": ["Taveta Town"], "Wundanyi": ["Wundanyi"], "Mwatate": ["Mwatate Town"], "Voi": ["Voi Central"] },
+            "Tana River": { "Bura": ["Bura"], "Galole": ["Hola"], "Garsen": ["Garsen"] },
+            "Tharaka Nithi": { "Chuka/Igambang'ombe": ["Chuka Town"], "Maara": ["Chogoria"], "Tharaka": ["Marimanti"] },
+            "Trans Nzoia": { "Cherangany": ["Cherangany"], "Endebess": ["Endebess"], "Kiminini": ["Kiminini"], "Kwanza": ["Kwanza"], "Saboti": ["Kitale Town", "Saboti"] },
+            "Turkana": { "Turkana Central": ["Lodwar"], "Turkana East": ["Lokori"], "Turkana North": ["Lokitaung"], "Turkana South": ["Lokichar"], "Turkana West": ["Kakuma"], "Loima": ["Loima"] },
+            "Uasin Gishu": { "Ainabkoi": ["Kapsoya"], "Kapseret": ["Langas", "Simat"], "Kesses": ["Tarakwa"], "Moiben": ["Moiben"], "Soy": ["Soy"], "Turbo": ["Huruma", "Kamagut", "Turbo"] },
+            "Vihiga": { "Emuhaya": ["Emuhaya"], "Hamisi": ["Hamisi"], "Luanda": ["Luanda Town"], "Sabatia": ["Sabatia"], "Vihiga": ["Mbale"] },
+            "Wajir": { "Eldas": ["Eldas"], "Tarbaj": ["Tarbaj"], "Wajir East": ["Township"], "Wajir North": ["Bute"], "Wajir South": ["Habaswein"], "Wajir West": ["Hadado"] },
+            "West Pokot": { "Kapenguria": ["Kapenguria"], "Sigor": ["Sigor"], "Kacheliba": ["Kacheliba"], "Pokot South": ["Lelan"] }
+        };
+
+        // --- 2. DEFAULT SEAT QUESTION BANK ---
+        const seatQuestionsBank = {
+            "President": [
+                { id: "q_nat_econ", text: "Rate national economic development & cost of living management", options: ["Excellent", "Satisfactory", "Poor", "Severe Crisis"] },
+                { id: "q_nat_infra", text: "Quality of national infrastructure projects (Highways, Energy, Rail)", options: ["High Quality", "Moderate", "Substandard"] },
+                { id: "q_nat_health", text: "Accessibility & affordability of Universal Healthcare (SHA/NHIF)", options: ["Seamless", "Partial Access", "Dysfunctional"] }
+            ],
+            "Governor": [
+                { id: "q_gov_health", text: "Condition and drug supply in County Referral & Level 4 Hospitals", options: ["Fully Stocked", "Frequent Shortages", "Critically Understaffed"] },
+                { id: "q_gov_feeder", text: "Maintenance of County & Agricultural Feeder Roads", options: ["Paved/Maintained", "Passable", "Impassable/Neglected"] },
+                { id: "q_gov_water", text: "Access to clean piped water & municipal waste collection", options: ["Reliable", "Intermittent", "No Access/Uncollected"] }
+            ],
+            "MP": [
+                { id: "q_mp_cdf", text: "NG-CDF Bursary distribution transparency and fairness", options: ["Very Transparent", "Somewhat Fair", "Corrupt/Biased"] },
+                { id: "q_mp_school", text: "Condition of public primary and junior secondary school structures", options: ["Well Built", "Overcrowded", "Dilapidated"] },
+                { id: "q_mp_sec", text: "Grassroots security & police post infrastructure support", options: ["Effective", "Moderate", "Inadequate"] }
+            ],
+            "MCA": [
+                { id: "q_mca_drainage", text: "Local neighborhood drainage & feeder path lighting status", options: ["Functional", "Blocked/Dark", "Non-existent"] },
+                { id: "q_mca_rep", text: "Frequency of Ward public barazas and community representation", options: ["Regular (Monthly)", "Rarely", "Never Seen"] },
+                { id: "q_mca_bursary", text: "Ward-level emergency and bursary allocation reach", options: ["Reaches Needy", "Partial Reach", "Not Transparent"] }
+            ]
+        };
+
+        // --- 3. GLOBAL APP STATE ---
+        let currentScreen = 1;
+        let selectedCounty = "";
+        let selectedConstituency = "";
+        let selectedWard = "";
+        let selectedSeat = "Governor";
+        let questionMode = "default"; // 'default' or 'custom'
+        let customQuestions = [];
+        
+        // Active Session Data
+        let activeSession = null; // { id, county, constituency, ward, seat, status, startedAt, respondents: [] }
+        let currentSentiment = null;
+        let allSessionsHistory = [];
+
+        // --- LOCAL STORAGE HELPERS ---
+        function saveToLocalStorage() {
+            localStorage.setItem("CWWK_ActiveSession", JSON.stringify(activeSession));
+            localStorage.setItem("CWWK_SessionsHistory", JSON.stringify(allSessionsHistory));
+            localStorage.setItem("CWWK_SetupState", JSON.stringify({
+                county: selectedCounty,
+                constituency: selectedConstituency,
+                ward: selectedWard,
+                seat: selectedSeat,
+                mode: questionMode,
+                customQs: customQuestions
+            }));
+        }
+
+        function loadFromLocalStorage() {
+            const history = localStorage.getItem("CWWK_SessionsHistory");
+            if (history) {
+                try { allSessionsHistory = JSON.parse(history); } catch(e){}
+            }
+
+            const active = localStorage.getItem("CWWK_ActiveSession");
+            if (active) {
+                try { activeSession = JSON.parse(active); } catch(e){}
+            }
+
+            const setup = localStorage.getItem("CWWK_SetupState");
+            if (setup) {
+                try {
+                    const parsed = JSON.parse(setup);
+                    selectedCounty = parsed.county || "";
+                    selectedConstituency = parsed.constituency || "";
+                    selectedWard = parsed.ward || "";
+                    selectedSeat = parsed.seat || "Governor";
+                    questionMode = parsed.mode || "default";
+                    customQuestions = parsed.customQs || [];
+                } catch(e){}
+            }
+        }
+
+        // --- INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromLocalStorage();
+            populateCounties();
+            restoreSetupUI();
+            
+            if (activeSession) {
+                updateTopStatusBadge();
+                renderLiveSurveyScreen();
+            } else {
+                updateTopStatusBadge();
+            }
+            
+            renderHistoryList();
+        });
+
+        function restoreSetupUI() {
+            // Restore County select
+            const countySelect = document.getElementById("select-county");
+            if (selectedCounty && kenyaData[selectedCounty]) {
+                countySelect.value = selectedCounty;
+                handleCountyChange(true);
+                
+                const constSelect = document.getElementById("select-constituency");
+                if (selectedConstituency && kenyaData[selectedCounty][selectedConstituency]) {
+                    constSelect.value = selectedConstituency;
+                    handleConstituencyChange(true);
+
+                    const wardSelect = document.getElementById("select-ward");
+                    if (selectedWard && kenyaData[selectedCounty][selectedConstituency].includes(selectedWard)) {
+                        wardSelect.value = selectedWard;
+                    }
+                }
+            }
+
+            // Restore seat UI
+            selectSeat(selectedSeat, true);
+
+            // Restore mode
+            setQuestionMode(questionMode, true);
+            
+            // Restore custom list render
+            renderCustomAddedList();
+
+            checkSetupValidity();
+        }
+
+        // --- NAVIGATION ---
+        function switchScreen(screenNum) {
+            currentScreen = screenNum;
+            document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
+            document.getElementById(`screen-${screenNum}`).classList.add('active');
+
+            // Update Desktop Nav UI
+            for(let i=1; i<=3; i++) {
+                const deskBtn = document.getElementById(`desk-nav-${i}`);
+                const mobBtn = document.getElementById(`mob-nav-${i}`);
+                
+                if (i === screenNum) {
+                    deskBtn.className = "nav-tab px-4 py-2.5 text-xs font-bold border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-2";
+                    mobBtn.className = "py-1 text-emerald-400 flex flex-col items-center gap-1 font-bold text-[11px]";
+                } else {
+                    deskBtn.className = "nav-tab px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2";
+                    mobBtn.className = "py-1 text-slate-400 flex flex-col items-center gap-1 font-bold text-[11px]";
+                }
+            }
+
+            if (screenNum === 3) {
+                renderHistoryList();
+            }
+        }
+
+        // --- SCREEN 1: SETUP LOGIC ---
+        function populateCounties() {
+            const countySelect = document.getElementById("select-county");
+            countySelect.innerHTML = '<option value="">-- Select County --</option>';
+            
+            Object.keys(kenyaData).sort().forEach(county => {
+                const opt = document.createElement("option");
+                opt.value = county;
+                opt.textContent = county + " County";
+                countySelect.appendChild(opt);
+            });
+        }
+
+        function handleCountyChange(isRestoring = false) {
+            const countySelect = document.getElementById("select-county");
+            selectedCounty = countySelect.value;
+
+            const constSelect = document.getElementById("select-constituency");
+            const wardSelect = document.getElementById("select-ward");
+
+            constSelect.innerHTML = '<option value="">-- Select Constituency --</option>';
+            wardSelect.innerHTML = '<option value="">-- Select Constituency First --</option>';
+            wardSelect.disabled = true;
+
+            if (selectedCounty && kenyaData[selectedCounty]) {
+                constSelect.disabled = false;
+                Object.keys(kenyaData[selectedCounty]).sort().forEach(c => {
+                    const opt = document.createElement("option");
+                    opt.value = c;
+                    opt.textContent = c;
+                    constSelect.appendChild(opt);
+                });
+            } else {
+                constSelect.disabled = true;
+                constSelect.innerHTML = '<option value="">-- Select County First --</option>';
+            }
+
+            if (!isRestoring) {
+                selectedConstituency = "";
+                selectedWard = "";
+                saveToLocalStorage();
+            }
+            checkSetupValidity();
+        }
+
+        function handleConstituencyChange(isRestoring = false) {
+            const constSelect = document.getElementById("select-constituency");
+            selectedConstituency = constSelect.value;
+
+            const wardSelect = document.getElementById("select-ward");
+            wardSelect.innerHTML = '<option value="">-- Select Electoral Ward --</option>';
+
+            if (selectedCounty && selectedConstituency && kenyaData[selectedCounty][selectedConstituency]) {
+                wardSelect.disabled = false;
+                kenyaData[selectedCounty][selectedConstituency].forEach(w => {
+                    const opt = document.createElement("option");
+                    opt.value = w;
+                    opt.textContent = w + " Ward";
+                    wardSelect.appendChild(opt);
+                });
+            } else {
+                wardSelect.disabled = true;
+                wardSelect.innerHTML = '<option value="">-- Select Constituency First --</option>';
+            }
+
+            if (!isRestoring) {
+                selectedWard = "";
+                saveToLocalStorage();
+            }
+            checkSetupValidity();
+        }
+
+        function checkSetupValidity() {
+            const wardSelect = document.getElementById("select-ward");
+            selectedWard = wardSelect.value;
+
+            const isValid = selectedCounty !== "" && selectedConstituency !== "" && selectedWard !== "";
+            const startBtn = document.getElementById("btn-start-survey");
+            startBtn.disabled = !isValid;
+
+            saveToLocalStorage();
+        }
+
+        function selectSeat(seatName, isRestoring = false) {
+            selectedSeat = seatName;
+            document.querySelectorAll('#seat-selector-grid .seat-card').forEach(card => {
+                const seatAttr = card.getAttribute('data-seat');
+                if (seatAttr === seatName) {
+                    card.className = "seat-card border-2 border-emerald-500 bg-emerald-50/60 p-3 rounded-xl text-left touch-active transition-all";
+                    const subtitle = card.querySelector('div:first-child');
+                    if (subtitle) subtitle.className = "text-[10px] text-emerald-700 font-bold uppercase";
+                } else {
+                    card.className = "seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all";
+                    const subtitle = card.querySelector('div:first-child');
+                    if (subtitle) subtitle.className = "text-[10px] text-slate-400 font-bold uppercase";
+                }
+            });
+
+            document.getElementById('seat-preview-label').textContent = seatName;
+            updateQuestionPreview();
+
+            if (!isRestoring) {
+                saveToLocalStorage();
+            }
+        }
+
+        function setQuestionMode(mode, isRestoring = false) {
+            questionMode = mode;
+            const btnDefault = document.getElementById('btn-mode-default');
+            const btnCustom = document.getElementById('btn-mode-custom');
+            const previewBox = document.getElementById('default-questions-preview');
+            const builderBox = document.getElementById('custom-questions-builder');
+
+            if (mode === 'default') {
+                btnDefault.className = "px-2.5 py-1 rounded-md font-bold bg-white text-slate-900 shadow-xs";
+                btnCustom.className = "px-2.5 py-1 rounded-semibold text-slate-500";
+                previewBox.classList.remove('hidden');
+                builderBox.classList.add('hidden');
+            } else {
+                btnCustom.className = "px-2.5 py-1 rounded-md font-bold bg-white text-emerald-900 shadow-xs";
+                btnDefault.className = "px-2.5 py-1 rounded-semibold text-slate-500";
+                previewBox.classList.add('hidden');
+                builderBox.classList.remove('hidden');
+            }
+
+            if (!isRestoring) {
+                saveToLocalStorage();
+            }
+        }
+
+        function updateQuestionPreview() {
+            const list = document.getElementById('questions-list-preview');
+            list.innerHTML = "";
+            const questions = seatQuestionsBank[selectedSeat] || [];
+            questions.forEach(q => {
+                const li = document.createElement('li');
+                li.className = "flex items-start gap-1.5 text-slate-700";
+                li.innerHTML = `<i class="fa-solid fa-circle-dot text-emerald-600 text-[10px] mt-1"></i> <span>${q.text}</span>`;
+                list.appendChild(li);
+            });
+        }
+
+        function addCustomQuestion() {
+            const titleInput = document.getElementById('custom-q-title');
+            const optionsInput = document.getElementById('custom-q-options');
+
+            const title = titleInput.value.trim();
+            const rawOpts = optionsInput.value.trim();
+
+            if (!title) {
+                alert("Please enter a question prompt!");
+                return;
+            }
+
+            let opts = rawOpts ? rawOpts.split(',').map(s => s.trim()).filter(Boolean) : ["Yes", "No"];
+
+            customQuestions.push({
+                id: 'cust_' + Date.now(),
+                text: title,
+                options: opts
+            });
+
+            titleInput.value = "";
+            optionsInput.value = "";
+            renderCustomAddedList();
+            saveToLocalStorage();
+        }
+
+        function removeCustomQuestion(index) {
+            customQuestions.splice(index, 1);
+            renderCustomAddedList();
+            saveToLocalStorage();
+        }
+
+        function renderCustomAddedList() {
+            const container = document.getElementById('custom-added-list');
+            if (customQuestions.length === 0) {
+                container.innerHTML = `<p class="text-[11px] text-slate-400 italic">No custom questions added.</p>`;
+                return;
+            }
+
+            container.innerHTML = "";
+            customQuestions.forEach((q, idx) => {
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between bg-white p-2 rounded-lg border border-emerald-200 text-xs";
+                div.innerHTML = `
+                    <div class="truncate max-w-[80%]">
+                        <strong class="text-slate-800 block truncate">${q.text}</strong>
+                        <span class="text-[10px] text-slate-400">Options: ${q.options.join(', ')}</span>
+                    </div>
+                    <button onclick="removeCustomQuestion(${idx})" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-1">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- START SURVEY SESSION ---
+        function startSurveySession() {
+            if (!selectedCounty || !selectedConstituency || !selectedWard) {
+                alert("Please select County, Constituency, and Ward before starting.");
+                return;
+            }
+
+            const questionsToUse = (questionMode === 'custom' && customQuestions.length > 0)
+                ? [...customQuestions]
+                : [...(seatQuestionsBank[selectedSeat] || [])];
+
+            activeSession = {
+                id: 'SESS_' + Date.now(),
+                county: selectedCounty,
+                constituency: selectedConstituency,
+                ward: selectedWard,
+                seat: selectedSeat,
+                mode: questionMode,
+                questions: questionsToUse,
+                status: 'ACTIVE', // 'ACTIVE', 'PAUSED', 'FINALIZED'
+                startedAt: new Date().toLocaleString('en-KE', { dateStyle: 'medium', timeStyle: 'short' }),
+                respondents: []
+            };
+
+            // Check if active session already exists in history array
+            const existingIdx = allSessionsHistory.findIndex(s => s.id === activeSession.id);
+            if (existingIdx === -1) {
+                allSessionsHistory.unshift(activeSession);
+            } else {
+                allSessionsHistory[existingIdx] = activeSession;
+            }
+
+            saveToLocalStorage();
+            updateTopStatusBadge();
+            renderLiveSurveyScreen();
+            switchScreen(2);
+        }
+
+        // --- SCREEN 2: LIVE FIELD SURVEY LOGIC ---
+        function renderLiveSurveyScreen() {
+            if (!activeSession) return;
+
+            // Update Banner
+            document.getElementById('active-seat-badge').textContent = activeSession.seat;
+            document.getElementById('active-location-title').textContent = `${activeSession.county} > ${activeSession.constituency} > ${activeSession.ward}`;
+            document.getElementById('session-count-tag').textContent = `${activeSession.respondents.length} Respondents`;
+            document.getElementById('current-respondent-id').textContent = activeSession.respondents.length + 1;
+
+            // Render Questions
+            const qContainer = document.getElementById('survey-questions-container');
+            qContainer.innerHTML = "";
+
+            activeSession.questions.forEach((q, idx) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = "space-y-1.5 pb-3 border-b border-slate-100 last:border-b-0";
+                qDiv.innerHTML = `
+                    <label class="block text-xs font-extrabold text-slate-800">
+                        ${idx + 1}. ${q.text}
+                    </label>
+                    <select id="survey-q-${q.id}" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="">-- Choose Response Option --</option>
+                        ${q.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                    </select>
+                `;
+                qContainer.appendChild(qDiv);
+            });
+
+            // Reset Sentiment selection
+            selectSentiment(null);
+            renderSentimentTally();
+        }
+
+        function selectSentiment(val) {
+            currentSentiment = val;
+            document.querySelectorAll('#sentiment-selector .sentiment-btn').forEach(btn => {
+                const attr = btn.getAttribute('data-sentiment');
+                if (attr === val) {
+                    btn.className = "sentiment-btn border-2 border-emerald-500 bg-emerald-50 p-2.5 rounded-xl text-center touch-active shadow-sm";
+                } else {
+                    btn.className = "sentiment-btn border-2 border-slate-200 bg-white p-2.5 rounded-xl text-center touch-active";
+                }
+            });
+        }
+
+        function submitRespondentData(isNext = true) {
+            if (!activeSession) return;
+
+            const answers = {};
+            let allFilled = true;
+
+            activeSession.questions.forEach(q => {
+                const val = document.getElementById(`survey-q-${q.id}`)?.value;
+                if (!val) allFilled = false;
+                answers[q.id] = val;
+            });
+
+            if (!allFilled) {
+                alert("Please answer all diagnostic survey questions before proceeding!");
+                return;
+            }
+
+            if (!currentSentiment) {
+                alert("Please select the overall voter sentiment!");
+                return;
+            }
+
+            const respondentRecord = {
+                id: activeSession.respondents.length + 1,
+                timestamp: new Date().toLocaleTimeString('en-KE', { timeStyle: 'short' }),
+                answers: answers,
+                sentiment: currentSentiment
+            };
+
+            activeSession.respondents.push(respondentRecord);
+
+            // Update in history array
+            const hIdx = allSessionsHistory.findIndex(s => s.id === activeSession.id);
+            if (hIdx !== -1) {
+                allSessionsHistory[hIdx] = activeSession;
+            } else {
+                allSessionsHistory.unshift(activeSession);
+            }
+
+            saveToLocalStorage();
+
+            if (isNext) {
+                // Refresh UI for next respondent
+                renderLiveSurveyScreen();
+            }
+        }
+
+        function renderSentimentTally() {
+            const container = document.getElementById('ordered-sentiment-bars-container');
+            container.innerHTML = "";
+
+            if (!activeSession) return;
+
+            const total = activeSession.respondents.length;
+            const counts = { Positive: 0, Neutral: 0, Negative: 0 };
+
+            activeSession.respondents.forEach(r => {
+                if (counts[r.sentiment] !== undefined) {
+                    counts[r.sentiment]++;
+                }
+            });
+
+            // Sort Sentiments High to Low
+            const sorted = Object.keys(counts).sort((a,b) => counts[b] - counts[a]);
+
+            const colorMap = {
+                Positive: { bg: "bg-emerald-500", text: "text-emerald-400" },
+                Neutral: { bg: "bg-amber-500", text: "text-amber-400" },
+                Negative: { bg: "bg-rose-500", text: "text-rose-400" }
+            };
+
+            sorted.forEach(sent => {
+                const count = counts[sent];
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                const colors = colorMap[sent];
+
+                const barDiv = document.createElement('div');
+                barDiv.className = "space-y-1";
+                barDiv.innerHTML = `
+                    <div class="flex justify-between text-[11px] font-bold">
+                        <span class="${colors.text}">${sent}</span>
+                        <span class="text-slate-300">${count} (${pct}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                        <div class="${colors.bg} h-full transition-all duration-300" style="width: ${pct}%"></div>
+                    </div>
+                `;
+                container.appendChild(barDiv);
+            });
+        }
+
+        function pauseSession() {
+            if (!activeSession) return;
+            activeSession.status = "PAUSED";
+            
+            const hIdx = allSessionsHistory.findIndex(s => s.id === activeSession.id);
+            if (hIdx !== -1) allSessionsHistory[hIdx] = activeSession;
+
+            saveToLocalStorage();
+            updateTopStatusBadge();
+            alert("Survey Session Paused! Data preserved.");
+            switchScreen(3);
+        }
+
+        function finalizeSession() {
+            if (!activeSession) return;
+
+            if (confirm("Are you sure you want to finalize this field survey session? No more entries can be added to it.")) {
+                activeSession.status = "FINALIZED";
+                
+                const hIdx = allSessionsHistory.findIndex(s => s.id === activeSession.id);
+                if (hIdx !== -1) allSessionsHistory[hIdx] = activeSession;
+
+                const completedSession = activeSession;
+                activeSession = null; // Clear active session
+
+                saveToLocalStorage();
+                updateTopStatusBadge();
+                switchScreen(3);
+                openBriefingModal(completedSession.id);
+            }
+        }
+
+        function updateTopStatusBadge() {
+            const badge = document.getElementById('top-status-badge');
+            const dot = document.getElementById('status-dot');
+            const text = document.getElementById('active-session-text');
+
+            if (activeSession) {
+                if (activeSession.status === 'ACTIVE') {
+                    dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+                    text.textContent = `Active: ${activeSession.ward}`;
+                    badge.className = "flex items-center gap-2 bg-emerald-950 px-3 py-1.5 rounded-full border border-emerald-600 text-xs text-emerald-200";
+                } else if (activeSession.status === 'PAUSED') {
+                    dot.className = "w-2 h-2 rounded-full bg-amber-400";
+                    text.textContent = `Paused: ${activeSession.ward}`;
+                    badge.className = "flex items-center gap-2 bg-amber-950 px-3 py-1.5 rounded-full border border-amber-600 text-xs text-amber-200";
+                }
+            } else {
+                dot.className = "w-2 h-2 rounded-full bg-slate-500";
+                text.textContent = "Setup Mode";
+                badge.className = "flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 text-xs text-slate-300";
+            }
+        }
+
+        // --- SCREEN 3: HISTORY & DELETION LOGIC ---
+        function renderHistoryList() {
+            const container = document.getElementById('history-cards-container');
+            container.innerHTML = "";
+
+            const query = document.getElementById('history-search').value.toLowerCase().trim();
+            const filterStatus = document.getElementById('history-filter-status').value;
+
+            let filtered = allSessionsHistory.filter(s => {
+                const matchesQuery = s.county.toLowerCase().includes(query) ||
+                                     s.constituency.toLowerCase().includes(query) ||
+                                     s.ward.toLowerCase().includes(query) ||
+                                     s.seat.toLowerCase().includes(query);
+                const matchesStatus = filterStatus === 'ALL' || s.status === filterStatus;
+                return matchesQuery && matchesStatus;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white p-8 rounded-2xl border border-slate-200 text-center space-y-2">
+                        <i class="fa-solid fa-folder-open text-3xl text-slate-300"></i>
+                        <p class="text-xs font-bold text-slate-500">No field survey history found.</p>
+                        <p class="text-[11px] text-slate-400">Complete or start a new survey to view history.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(session => {
+                const isCurrentActive = activeSession && activeSession.id === session.id;
+
+                let statusBadgeClass = "bg-emerald-100 text-emerald-800 border-emerald-200";
+                if (session.status === "PAUSED") statusBadgeClass = "bg-amber-100 text-amber-800 border-amber-200";
+                if (session.status === "FINALIZED") statusBadgeClass = "bg-slate-100 text-slate-700 border-slate-200";
+
+                const totalResp = session.respondents.length;
+
+                // Tally Sentiment Breakdown
+                const counts = { Positive: 0, Neutral: 0, Negative: 0 };
+                session.respondents.forEach(r => { if(counts[r.sentiment] !== undefined) counts[r.sentiment]++; });
+
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3 relative";
+                card.innerHTML = `
+                    <div class="flex items-start justify-between pr-8">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${statusBadgeClass}">
+                                    ${session.status}
+                                </span>
+                                <span class="text-[10px] font-bold text-slate-400"><i class="fa-solid fa-clock"></i> ${session.startedAt}</span>
+                            </div>
+                            <h3 class="font-black text-sm text-slate-900">${session.county} &gt; ${session.constituency} &gt; ${session.ward}</h3>
+                            <p class="text-xs font-semibold text-emerald-700"><i class="fa-solid fa-user-tie"></i> Target Office: ${session.seat}</p>
+                        </div>
+                        
+                        <!-- Side Delete Icon Button -->
+                        <button onclick="deleteSessionFromHistory('${session.id}')" title="Delete Session Data" class="absolute top-4 right-4 text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-all">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex items-center justify-between text-xs">
+                        <div class="font-bold text-slate-700">
+                            Total Respondents: <span class="text-emerald-700 font-black">${totalResp}</span>
+                        </div>
+                        <div class="flex gap-2 text-[10px] font-bold">
+                            <span class="text-emerald-600"><i class="fa-solid fa-smile"></i> ${counts.Positive}</span>
+                            <span class="text-amber-600"><i class="fa-solid fa-meh"></i> ${counts.Neutral}</span>
+                            <span class="text-rose-600"><i class="fa-solid fa-frown"></i> ${counts.Negative}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-1 border-t border-slate-100">
+                        <button onclick="openBriefingModal('${session.id}')" class="flex-1 bg-slate-900 hover:bg-black text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 touch-active">
+                            <i class="fa-solid fa-file-lines"></i> View Briefing Report
+                        </button>
+
+                        ${session.status !== 'FINALIZED' ? `
+                            <button onclick="resumeSessionFromHistory('${session.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 touch-active">
+                                <i class="fa-solid fa-play"></i> Resume
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function deleteSessionFromHistory(sessionId) {
+            if (confirm("Are you sure you want to permanently delete this survey dataset?")) {
+                allSessionsHistory = allSessionsHistory.filter(s => s.id !== sessionId);
+
+                if (activeSession && activeSession.id === sessionId) {
+                    activeSession = null;
+                    updateTopStatusBadge();
+                }
+
+                saveToLocalStorage();
+                renderHistoryList();
+            }
+        }
+
+        function resumeSessionFromHistory(sessionId) {
+            const found = allSessionsHistory.find(s => s.id === sessionId);
+            if (found) {
+                activeSession = found;
+                activeSession.status = "ACTIVE";
+                saveToLocalStorage();
+                updateTopStatusBadge();
+                renderLiveSurveyScreen();
+                switchScreen(2);
+            }
+        }
+
+        // --- BRIEFING REPORT MODAL LOGIC ---
+        function openBriefingModal(sessionId) {
+            const session = allSessionsHistory.find(s => s.id === sessionId);
+            if (!session) return;
+
+            const modal = document.getElementById('briefing-modal');
+            const body = document.getElementById('modal-content-body');
+
+            const total = session.respondents.length;
+            const counts = { Positive: 0, Neutral: 0, Negative: 0 };
+            session.respondents.forEach(r => { if(counts[r.sentiment] !== undefined) counts[r.sentiment]++; });
+
+            let sentimentAnalysis = "Balanced ground feedback.";
+            if (total > 0) {
+                if (counts.Positive / total > 0.5) sentimentAnalysis = "Predominantly Strong Positive Ground Support.";
+                else if (counts.Negative / total > 0.5) sentimentAnalysis = "Widespread High Ground Dissatisfaction/Grievances.";
+                else if (counts.Neutral / total > 0.4) sentimentAnalysis = "High Undecided/Fence-sitting Voter Base.";
+            }
+
+            body.innerHTML = `
+                <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 space-y-1">
+                    <p class="font-extrabold text-emerald-950">${session.county} County (${session.constituency} - ${session.ward} Ward)</p>
+                    <p class="text-[11px] text-emerald-800">Target Seat: <strong class="font-bold uppercase">${session.seat}</strong> | Status: ${session.status}</p>
+                    <p class="text-[10px] text-slate-500">Date Logged: ${session.startedAt}</p>
+                </div>
+
+                <div class="space-y-1.5">
+                    <strong class="text-xs font-black text-slate-800 uppercase tracking-wide block">Executive Summary</strong>
+                    <p class="text-slate-600 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                        Field data collected across <strong>${total} ground respondents</strong> in ${session.ward} Ward indicates: 
+                        <span class="font-bold text-slate-900">${sentimentAnalysis}</span>
+                    </p>
+                </div>
+
+                <div class="space-y-1.5">
+                    <strong class="text-xs font-black text-slate-800 uppercase tracking-wide block">Voter Sentiment Distribution</strong>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="bg-emerald-50 border border-emerald-200 p-2 rounded-lg">
+                            <span class="block text-[10px] font-bold text-emerald-700">Positive</span>
+                            <span class="text-base font-black text-emerald-900">${counts.Positive}</span>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-200 p-2 rounded-lg">
+                            <span class="block text-[10px] font-bold text-amber-700">Neutral</span>
+                            <span class="text-base font-black text-amber-900">${counts.Neutral}</span>
+                        </div>
+                        <div class="bg-rose-50 border border-rose-200 p-2 rounded-lg">
+                            <span class="block text-[10px] font-bold text-rose-700">Negative</span>
+                            <span class="text-base font-black text-rose-900">${counts.Negative}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            modal.dataset.currentSessionId = sessionId;
+            modal.classList.remove('hidden');
+        }
+
+        function closeBriefingModal() {
+            document.getElementById('briefing-modal').classList.add('hidden');
+        }
+
+        function triggerCopyReport() {
+            const modal = document.getElementById('briefing-modal');
+            const sessionId = modal.dataset.currentSessionId;
+            const session = allSessionsHistory.find(s => s.id === sessionId);
+
+            if (!session) return;
+
+            const total = session.respondents.length;
+            const text = `CONCERN WORLD-WIDE KENYA FIELD REPORT\nLocation: ${session.county} > ${session.constituency} > ${session.ward}\nTarget Office: ${session.seat}\nTotal Respondents: ${total}\nDate: ${session.startedAt}\nStatus: ${session.status}`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Field briefing text copied to clipboard!");
+            });
+        }
+    </script>
+</body>
+</html>
