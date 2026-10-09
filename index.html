@@ -4,15 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Concern World-wide Kenya - Field Collector</title>
-
-    <!-- Web App & iOS PWA Meta Tags -->
-    <meta name="theme-color" content="#000000">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="CWWK Field">
-    <meta name="application-name" content="CWWK Field">
-    <meta name="description" content="Concern World-wide Kenya - Ground Field Intelligence & Survey Tracker PWA">
-
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -63,6 +54,13 @@
         }
 
         /* Swinging Kenya Flag Ribbon Animation */
+        .flag-stripe-container {
+            width: 100%;
+            height: 8px;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
         .flag-black { background-color: #000000; flex: 1; }
         .flag-white-top { background-color: #ffffff; height: 1.5px; width: 100%; }
         .flag-red { background-color: #BB0000; flex: 1; }
@@ -107,9 +105,11 @@
 
         <div class="max-w-md mx-auto md:max-w-4xl px-4 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <!-- Custom Canvas-Generated CWWK Logo Badge -->
-                <div class="w-11 h-11 bg-black rounded-2xl flex items-center justify-center p-0.5 border border-slate-700 shadow-md relative group overflow-hidden">
-                    <img id="app-header-logo" src="" alt="CWWK Logo" class="w-full h-full object-cover rounded-xl">
+                <!-- Instagram Style Black Box Logo with CWWK -->
+                <div class="w-11 h-11 bg-black rounded-2xl flex items-center justify-center p-0.5 border border-slate-700 shadow-md relative group">
+                    <div class="w-full h-full border border-slate-800 rounded-xl flex items-center justify-center bg-gradient-to-tr from-black via-slate-950 to-slate-900">
+                        <span class="font-black text-xs tracking-tighter text-white">CWWK</span>
+                    </div>
                 </div>
                 <div>
                     <h1 class="font-bold text-base md:text-lg leading-tight tracking-wide flex items-center gap-2">
@@ -141,25 +141,6 @@
             </div>
         </nav>
     </header>
-
-    <!-- PWA Installation Banner (Prompts Users to Install App) -->
-    <div id="pwa-install-banner" class="bg-gradient-to-r from-emerald-900 to-slate-900 text-white p-3 shadow-lg hidden">
-        <div class="max-w-md mx-auto md:max-w-4xl flex items-center justify-between text-xs gap-2">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-mobile-screen-button text-emerald-400 text-lg"></i>
-                <div>
-                    <strong class="block font-bold">Install CWWK Field App</strong>
-                    <span class="text-[10px] text-slate-300">Install to phone home screen for quick access!</span>
-                </div>
-            </div>
-            <div class="flex items-center gap-1.5">
-                <button onclick="triggerPwaInstall()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-3 py-1.5 rounded-lg text-xs shadow touch-active">
-                    Install
-                </button>
-                <button onclick="dismissPwaBanner()" class="text-slate-400 hover:text-white px-2 py-1 text-sm font-bold">&times;</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Main Mobile Container -->
     <main class="flex-grow max-w-md mx-auto md:max-w-4xl w-full p-4 space-y-4">
@@ -210,28 +191,44 @@
                 </div>
             </div>
 
-            <!-- Target Seat Selector Grid -->
+            <!-- Target Seat Selector Grid (ALL 6 ELECTORAL SEATS) -->
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                     <i class="fa-solid fa-user-tie text-emerald-600"></i> Political Office Seat
                 </h3>
 
-                <div class="grid grid-cols-2 gap-2.5" id="seat-selector-grid">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="seat-selector-grid">
+                    <!-- 1. President -->
                     <button type="button" onclick="selectSeat('President')" data-seat="President" class="seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all">
                         <div class="text-[10px] text-slate-400 font-bold uppercase">National</div>
                         <div class="text-xs font-black text-slate-800">President</div>
                     </button>
 
+                    <!-- 2. Governor -->
                     <button type="button" onclick="selectSeat('Governor')" data-seat="Governor" class="seat-card border-2 border-emerald-500 bg-emerald-50/60 p-3 rounded-xl text-left touch-active transition-all">
                         <div class="text-[10px] text-emerald-700 font-bold uppercase">County Executive</div>
                         <div class="text-xs font-black text-slate-900">Governor</div>
                     </button>
 
+                    <!-- 3. Senator -->
+                    <button type="button" onclick="selectSeat('Senator')" data-seat="Senator" class="seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all">
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">County Senate</div>
+                        <div class="text-xs font-black text-slate-800">Senator</div>
+                    </button>
+
+                    <!-- 4. Women Representative -->
+                    <button type="button" onclick="selectSeat('Women Rep')" data-seat="Women Rep" class="seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all">
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">County Affirmative</div>
+                        <div class="text-xs font-black text-slate-800">Women Rep</div>
+                    </button>
+
+                    <!-- 5. MP (NG-CDF) -->
                     <button type="button" onclick="selectSeat('MP')" data-seat="MP" class="seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all">
                         <div class="text-[10px] text-slate-400 font-bold uppercase">Constituency</div>
                         <div class="text-xs font-black text-slate-800">MP (NG-CDF)</div>
                     </button>
 
+                    <!-- 6. MCA -->
                     <button type="button" onclick="selectSeat('MCA')" data-seat="MCA" class="seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all">
                         <div class="text-[10px] text-slate-400 font-bold uppercase">Grassroots Ward</div>
                         <div class="text-xs font-black text-slate-800">MCA</div>
@@ -461,164 +458,9 @@
         </div>
     </div>
 
+    <!-- JavaScript Data Directory & Logic -->
     <script>
-        // --- PWA ICON & MANIFEST GENERATOR ---
-        function generateCWWKLogoDataUri(size = 512) {
-            const canvas = document.createElement('canvas');
-            canvas.width = size;
-            canvas.height = size;
-            const ctx = canvas.getContext('2d');
-
-            // Black Rounded Square Background
-            const radius = size * 0.22;
-            ctx.fillStyle = '#000000';
-            ctx.beginPath();
-            ctx.moveTo(radius, 0);
-            ctx.lineTo(size - radius, 0);
-            ctx.quadraticCurveTo(size, 0, size, radius);
-            ctx.lineTo(size, size - radius);
-            ctx.quadraticCurveTo(size, size, size - radius, size);
-            ctx.lineTo(radius, size);
-            ctx.quadraticCurveTo(0, size, 0, size - radius);
-            ctx.lineTo(0, radius);
-            ctx.quadraticCurveTo(0, 0, radius, 0);
-            ctx.closePath();
-            ctx.fill();
-
-            // Inner Slate Border
-            ctx.strokeStyle = '#1e293b';
-            ctx.lineWidth = size * 0.03;
-            ctx.stroke();
-
-            // Kenya Flag Stripes at Top
-            const stripeHeight = size * 0.04;
-            // Black Stripe
-            ctx.fillStyle = '#000000';
-            ctx.fillRect(size * 0.1, size * 0.12, size * 0.8, stripeHeight);
-            // White Divider
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(size * 0.1, size * 0.12 + stripeHeight, size * 0.8, stripeHeight * 0.2);
-            // Red Stripe
-            ctx.fillStyle = '#BB0000';
-            ctx.fillRect(size * 0.1, size * 0.12 + stripeHeight * 1.2, size * 0.8, stripeHeight);
-            // White Divider
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(size * 0.1, size * 0.12 + stripeHeight * 2.2, size * 0.8, stripeHeight * 0.2);
-            // Green Stripe
-            ctx.fillStyle = '#006600';
-            ctx.fillRect(size * 0.1, size * 0.12 + stripeHeight * 2.4, size * 0.8, stripeHeight);
-
-            // CWWK Text Branding
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = `900 ${size * 0.26}px Inter, sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('CWWK', size / 2, size * 0.62);
-
-            // Subtext KENYA
-            ctx.fillStyle = '#10b981';
-            ctx.font = `800 ${size * 0.08}px Inter, sans-serif`;
-            ctx.fillText('KENYA', size / 2, size * 0.82);
-
-            return canvas.toDataURL('image/png');
-        }
-
-        // Initialize PWA App Icons & Manifest Dynamic Injections
-        let deferredPwaPrompt = null;
-
-        function initPwaManifestAndIcons() {
-            const logo512 = generateCWWKLogoDataUri(512);
-            const logo192 = generateCWWKLogoDataUri(192);
-
-            // Set Header Logo Source
-            document.getElementById('app-header-logo').src = logo192;
-
-            // Favicon & Apple Touch Icon Injection
-            const appleIcon = document.createElement('link');
-            appleIcon.rel = 'apple-touch-icon';
-            appleIcon.href = logo192;
-            document.head.appendChild(appleIcon);
-
-            const favicon = document.createElement('link');
-            favicon.rel = 'icon';
-            favicon.type = 'image/png';
-            favicon.href = logo192;
-            document.head.appendChild(favicon);
-
-            // Web App Manifest Object
-            const manifestObj = {
-                name: "Concern World-wide Kenya - Field Collector",
-                short_name: "CWWK Field",
-                description: "Ground Field Intelligence & Survey Tracker",
-                start_url: "./",
-                display: "standalone",
-                background_color: "#000000",
-                theme_color: "#000000",
-                icons: [
-                    { src: logo192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
-                    { src: logo512, sizes: "512x512", type: "image/png", purpose: "any maskable" }
-                ]
-            };
-
-            const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/json' });
-            const manifestURL = URL.createObjectURL(manifestBlob);
-
-            const manifestLink = document.createElement('link');
-            manifestLink.rel = 'manifest';
-            manifestLink.href = manifestURL;
-            document.head.appendChild(manifestLink);
-
-            // Inline Service Worker Blob Setup
-            const swCode = `
-                const CACHE_NAME = 'cwwk-v1';
-                self.addEventListener('install', (e) => {
-                    self.skipWaiting();
-                });
-                self.addEventListener('activate', (e) => {
-                    e.waitUntil(clients.claim());
-                });
-                self.addEventListener('fetch', (e) => {
-                    e.respondWith(
-                        fetch(e.request).catch(() => caches.match(e.request))
-                    );
-                });
-            `;
-            const swBlob = new Blob([swCode], { type: 'application/javascript' });
-            const swURL = URL.createObjectURL(swBlob);
-
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register(swURL).catch(err => console.log('SW Registration:', err));
-            }
-        }
-
-        // Catch PWA Install Prompt Event
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPwaPrompt = e;
-            document.getElementById('pwa-install-banner').classList.remove('hidden');
-        });
-
-        function triggerPwaInstall() {
-            if (deferredPwaPrompt) {
-                deferredPwaPrompt.prompt();
-                deferredPwaPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        document.getElementById('pwa-install-banner').classList.add('hidden');
-                    }
-                    deferredPwaPrompt = null;
-                });
-            } else {
-                alert("To install on iOS Safari: Tap Share button ⎋ -> Scroll down & select 'Add to Home Screen'.");
-            }
-        }
-
-        function dismissPwaBanner() {
-            document.getElementById('pwa-install-banner').classList.add('hidden');
-        }
-    </script>
-
-    <script>
-        // --- 1. COMPREHENSIVE 47 KENYA COUNTIES DIRECTORY ---
+        // --- 1. COMPREHENSIVE KENYA COUNTIES DIRECTORY ---
         const kenyaData = {
             "Baringo": { "Baringo Central": ["Kabarnet", "Sacho", "Ewalel Soi"], "Baringo North": ["Barwessa", "Kabartonjo"], "Baringo South": ["Marigat", "Ilchamus"], "Eldama Ravine": ["Lembus", "Ravine"], "Mogotio": ["Mogotio", "Emining"], "Tiaty": ["Tirioko", "Kolowa"] },
             "Bomet": { "Bomet Central": ["Siloibwet", "Ndaraweta"], "Bomet East": ["Longisa", "Kembu"], "Chepalungu": ["Sigor", "Kongasis"], "Konoin": ["Mogogosiek", "Boito"], "Sotik": ["Ndanai/Abosi", "Kipsonoi"] },
@@ -669,7 +511,7 @@
             "West Pokot": { "Kapenguria": ["Kapenguria"], "Sigor": ["Sigor"], "Kacheliba": ["Kacheliba"], "Pokot South": ["Lelan"] }
         };
 
-        // --- 2. DEFAULT SEAT QUESTION BANK ---
+        // --- 2. COMPLETE SEAT QUESTION BANK FOR ALL 6 KENYAN SEATS ---
         const seatQuestionsBank = {
             "President": [
                 { id: "q_nat_econ", text: "Rate national economic development & cost of living management", options: ["Excellent", "Satisfactory", "Poor", "Severe Crisis"] },
@@ -680,6 +522,16 @@
                 { id: "q_gov_health", text: "Condition and drug supply in County Referral & Level 4 Hospitals", options: ["Fully Stocked", "Frequent Shortages", "Critically Understaffed"] },
                 { id: "q_gov_feeder", text: "Maintenance of County & Agricultural Feeder Roads", options: ["Paved/Maintained", "Passable", "Impassable/Neglected"] },
                 { id: "q_gov_water", text: "Access to clean piped water & municipal waste collection", options: ["Reliable", "Intermittent", "No Access/Uncollected"] }
+            ],
+            "Senator": [
+                { id: "q_sen_oversight", text: "Effectiveness in oversight of county revenue allocations & executive spending", options: ["Very Effective", "Moderate Oversight", "Weak/Passive"] },
+                { id: "q_sen_devolution", text: "Defense of devolution and county resource allocation in Parliament", options: ["Strong Champion", "Average", "Ineffective"] },
+                { id: "q_sen_rep", text: "Public engagement and reporting back to county residents", options: ["Regular Barazas", "Occasional", "Never Seen"] }
+            ],
+            "Woman Rep": [
+                { id: "q_wrep_ngaaf", text: "NGAAF fund distribution transparency (Women, Youth & PWD grants)", options: ["Very Fair & Transparent", "Somewhat Fair", "Corrupt/Biased"] },
+                { id: "q_wrep_empower", text: "Impact of economic empowerment & vocational training programs", options: ["High Impact", "Moderate Impact", "No Visible Impact"] },
+                { id: "q_wrep_gender", text: "Advocacy on Gender-Based Violence (GBV) & maternal healthcare support", options: ["Strong Advocate", "Fair Support", "Inactive"] }
             ],
             "MP": [
                 { id: "q_mp_cdf", text: "NG-CDF Bursary distribution transparency and fairness", options: ["Very Transparent", "Somewhat Fair", "Corrupt/Biased"] },
@@ -699,13 +551,15 @@
         let selectedConstituency = "";
         let selectedWard = "";
         let selectedSeat = "Governor";
-        let questionMode = "default";
+        let questionMode = "default"; // 'default' or 'custom'
         let customQuestions = [];
         
+        // Active Session Data
         let activeSession = null;
         let currentSentiment = null;
         let allSessionsHistory = [];
 
+        // --- LOCAL STORAGE HELPERS ---
         function saveToLocalStorage() {
             localStorage.setItem("CWWK_ActiveSession", JSON.stringify(activeSession));
             localStorage.setItem("CWWK_SessionsHistory", JSON.stringify(allSessionsHistory));
@@ -746,7 +600,6 @@
 
         // --- INITIALIZATION ---
         window.addEventListener('DOMContentLoaded', () => {
-            initPwaManifestAndIcons();
             loadFromLocalStorage();
             populateCounties();
             restoreSetupUI();
@@ -809,6 +662,7 @@
             }
         }
 
+        // --- SCREEN 1: SETUP LOGIC ---
         function populateCounties() {
             const countySelect = document.getElementById("select-county");
             countySelect.innerHTML = '<option value="">-- Select County --</option>';
@@ -1043,6 +897,7 @@
             switchScreen(2);
         }
 
+        // --- SCREEN 2: LIVE FIELD SURVEY LOGIC ---
         function renderLiveSurveyScreen() {
             if (!activeSession) return;
 
@@ -1227,6 +1082,7 @@
             }
         }
 
+        // --- SCREEN 3: HISTORY & DELETION LOGIC ---
         function renderHistoryList() {
             const container = document.getElementById('history-cards-container');
             container.innerHTML = "";
@@ -1260,7 +1116,6 @@
                 if (session.status === "FINALIZED") statusBadgeClass = "bg-slate-100 text-slate-700 border-slate-200";
 
                 const totalResp = session.respondents.length;
-
                 const counts = { Positive: 0, Neutral: 0, Negative: 0 };
                 session.respondents.forEach(r => { if(counts[r.sentiment] !== undefined) counts[r.sentiment]++; });
 
@@ -1338,6 +1193,7 @@
             }
         }
 
+        // --- BRIEFING REPORT MODAL LOGIC ---
         function openBriefingModal(sessionId) {
             const session = allSessionsHistory.find(s => s.id === sessionId);
             if (!session) return;
