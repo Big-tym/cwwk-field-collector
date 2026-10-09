@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#006600">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CWWK Field Collector">
     <title>Concern World-wide Kenya - Field Collector</title>
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -11,6 +16,85 @@
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
+    <!-- DYNAMIC PWA MANIFEST & ICON GENERATOR -->
+    <script>
+        // 1. Generate High-Res App Icon via Canvas Data URL
+        function generateAppIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Black background
+            ctx.fillStyle = '#090d16';
+            ctx.fillRect(0, 0, size, size);
+
+            // Kenya Flag Stripes at the top
+            const stripeHeight = size * 0.04;
+            ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, size, stripeHeight);
+            ctx.fillStyle = '#BB0000'; ctx.fillRect(0, stripeHeight * 1.5, size, stripeHeight);
+            ctx.fillStyle = '#006600'; ctx.fillRect(0, stripeHeight * 3, size, stripeHeight);
+
+            // CWWK Text Box
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `900 ${size * 0.28}px Inter, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('CWWK', size / 2, size / 2 + size * 0.05);
+
+            return canvas.toDataURL('image/png');
+        }
+
+        const icon192 = generateAppIcon(192);
+        const icon512 = generateAppIcon(512);
+
+        // Inject Favicons and Apple Touch Icon
+        const appleIcon = document.createElement('link');
+        appleIcon.rel = 'apple-touch-icon';
+        appleIcon.href = icon192;
+        document.head.appendChild(appleIcon);
+
+        const favicon = document.createElement('link');
+        favicon.rel = 'icon';
+        favicon.type = 'image/png';
+        favicon.href = icon192;
+        document.head.appendChild(favicon);
+
+        // 2. Generate and Inject Web App Manifest Data URL
+        const manifestObj = {
+            "name": "Concern World-wide Kenya",
+            "short_name": "CWWK Field",
+            "description": "Ground Field Intelligence & Survey Tracker",
+            "start_url": "./",
+            "display": "standalone",
+            "background_color": "#090d16",
+            "theme_color": "#006600",
+            "icons": [
+                { "src": icon192, "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+                { "src": icon512, "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+            ]
+        };
+
+        const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        const manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = manifestURL;
+        document.head.appendChild(manifestLink);
+
+        // 3. Inline Service Worker Registration for PWA Compliance
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', (e) => self.skipWaiting());
+                self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+                self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+            `;
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            const swURL = URL.createObjectURL(swBlob);
+            navigator.serviceWorker.register(swURL).catch(err => console.log('SW Reg Error:', err));
+        }
+    </script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -54,19 +138,6 @@
         }
 
         /* Swinging Kenya Flag Ribbon Animation */
-        .flag-stripe-container {
-            width: 100%;
-            height: 8px;
-            display: flex;
-            overflow: hidden;
-            position: relative;
-        }
-        .flag-black { background-color: #000000; flex: 1; }
-        .flag-white-top { background-color: #ffffff; height: 1.5px; width: 100%; }
-        .flag-red { background-color: #BB0000; flex: 1; }
-        .flag-white-bottom { background-color: #ffffff; height: 1.5px; width: 100%; }
-        .flag-green { background-color: #006600; flex: 1; }
-
         .swing-ribbon {
             display: flex;
             flex-direction: column;
@@ -75,6 +146,12 @@
             transform-origin: top center;
             animation: flagSwing 3.5s ease-in-out infinite alternate;
         }
+
+        .flag-black { background-color: #000000; flex: 1; }
+        .flag-white-top { background-color: #ffffff; height: 1.5px; width: 100%; }
+        .flag-red { background-color: #BB0000; flex: 1; }
+        .flag-white-bottom { background-color: #ffffff; height: 1.5px; width: 100%; }
+        .flag-green { background-color: #006600; flex: 1; }
 
         @keyframes flagSwing {
             0% { transform: skewX(-4deg) scaleY(1); }
@@ -89,6 +166,25 @@
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col pb-20 md:pb-0 select-none">
+
+    <!-- PROMINENT PWA INSTALL BANNER -->
+    <div id="pwa-install-banner" class="hidden bg-emerald-700 text-white px-4 py-2.5 shadow-md flex items-center justify-between z-50 sticky top-0">
+        <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center font-black text-[10px] border border-slate-700">
+                CWWK
+            </div>
+            <div>
+                <p class="text-xs font-black leading-tight">Install CWWK Field App</p>
+                <p class="text-[10px] text-emerald-200">Tap to add to phone home screen</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="triggerPwaInstall()" class="bg-white text-emerald-900 px-3 py-1 rounded-lg font-extrabold text-xs shadow-sm touch-active">
+                Install App
+            </button>
+            <button onclick="dismissPwaBanner()" class="text-emerald-200 font-bold text-sm px-1">&times;</button>
+        </div>
+    </div>
 
     <!-- Top Global Header -->
     <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md">
@@ -198,37 +294,31 @@
                 </h3>
 
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="seat-selector-grid">
-                    <!-- 1. President -->
                     <button type="button" onclick="selectSeat('President')" data-seat="President" class="seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all">
                         <div class="text-[10px] text-slate-400 font-bold uppercase">National</div>
                         <div class="text-xs font-black text-slate-800">President</div>
                     </button>
 
-                    <!-- 2. Governor -->
                     <button type="button" onclick="selectSeat('Governor')" data-seat="Governor" class="seat-card border-2 border-emerald-500 bg-emerald-50/60 p-3 rounded-xl text-left touch-active transition-all">
                         <div class="text-[10px] text-emerald-700 font-bold uppercase">County Executive</div>
                         <div class="text-xs font-black text-slate-900">Governor</div>
                     </button>
 
-                    <!-- 3. Senator -->
                     <button type="button" onclick="selectSeat('Senator')" data-seat="Senator" class="seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all">
                         <div class="text-[10px] text-slate-400 font-bold uppercase">County Senate</div>
                         <div class="text-xs font-black text-slate-800">Senator</div>
                     </button>
 
-                    <!-- 4. Women Representative -->
-                    <button type="button" onclick="selectSeat('Women Rep')" data-seat="Women Rep" class="seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all">
+                    <button type="button" onclick="selectSeat('Woman Rep')" data-seat="Woman Rep" class="seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all">
                         <div class="text-[10px] text-slate-400 font-bold uppercase">County Affirmative</div>
-                        <div class="text-xs font-black text-slate-800">Women Rep</div>
+                        <div class="text-xs font-black text-slate-800">Woman Rep</div>
                     </button>
 
-                    <!-- 5. MP (NG-CDF) -->
                     <button type="button" onclick="selectSeat('MP')" data-seat="MP" class="seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all">
                         <div class="text-[10px] text-slate-400 font-bold uppercase">Constituency</div>
                         <div class="text-xs font-black text-slate-800">MP (NG-CDF)</div>
                     </button>
 
-                    <!-- 6. MCA -->
                     <button type="button" onclick="selectSeat('MCA')" data-seat="MCA" class="seat-card border-2 border-slate-200 bg-white p-3 rounded-xl text-left touch-active transition-all">
                         <div class="text-[10px] text-slate-400 font-bold uppercase">Grassroots Ward</div>
                         <div class="text-xs font-black text-slate-800">MCA</div>
@@ -460,6 +550,34 @@
 
     <!-- JavaScript Data Directory & Logic -->
     <script>
+        // --- PWA NATIVE INSTALLATION PROMPT HANDLER ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.classList.remove('hidden');
+        });
+
+        function triggerPwaInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        dismissPwaBanner();
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                alert("To install on iOS: Tap Share icon at the bottom of Safari and select 'Add to Home Screen'.\nTo install on Android: Tap Chrome menu (3 dots) and select 'Install app'.");
+            }
+        }
+
+        function dismissPwaBanner() {
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.classList.add('hidden');
+        }
+
         // --- 1. COMPREHENSIVE KENYA COUNTIES DIRECTORY ---
         const kenyaData = {
             "Baringo": { "Baringo Central": ["Kabarnet", "Sacho", "Ewalel Soi"], "Baringo North": ["Barwessa", "Kabartonjo"], "Baringo South": ["Marigat", "Ilchamus"], "Eldama Ravine": ["Lembus", "Ravine"], "Mogotio": ["Mogotio", "Emining"], "Tiaty": ["Tirioko", "Kolowa"] },
@@ -551,10 +669,9 @@
         let selectedConstituency = "";
         let selectedWard = "";
         let selectedSeat = "Governor";
-        let questionMode = "default"; // 'default' or 'custom'
+        let questionMode = "default";
         let customQuestions = [];
         
-        // Active Session Data
         let activeSession = null;
         let currentSentiment = null;
         let allSessionsHistory = [];
